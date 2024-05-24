@@ -1,0 +1,16 @@
+clear all;
+clc;
+
+n = 100;
+A = randn(n,n);
+[Q,~] = qr(A);
+tic
+mu_1 = randn(); mu_2 = randn();
+H = (Q+Q') / 2; S = (Q-Q') / 2;
+A_mu = mu_1 * H + mu_2*i * S;
+[D,U] = eig(A);
+toc
+
+tic
+schur(Q)
+toc
