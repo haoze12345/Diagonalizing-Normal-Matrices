@@ -6,12 +6,10 @@ def randdiag(U):
     H = (U+U.conj().T) / 2; S = (U-U.conj().T) / 2
     mu = np.random.normal(0,1,2)
     A_mu = mu[0] * H + mu[1] * 1j*S #+ mu[2]*1j * H + mu[3]* 1j * 1j * S
-    _, Q = eigh(A_mu,overwrite_a=True,overwrite_b = True)
+    _, Q = eigh(A_mu,overwrite_a=True,overwrite_b = True,check_finite=False)
     return Q
 
-
 def eigenvalue_unitary_angle(U):
-    n = U.shape[1]
     H = (U+U.conj().T) / 2; S = (U-U.conj().T) / 2
     mu = np.random.normal(0,1,2)
     A_mu = mu[0] * H + mu[1] * 1j*S
@@ -25,6 +23,6 @@ def eigenvalue_unitary_angle(U):
     D1_plus = angle+D1; D1_plus = D1_plus + (D1_plus > np.pi) * (- 2*np.pi) 
     D1_minus = angle-D1; D1_minus = D1_minus  + (D1_minus < -np.pi) * (2*np.pi)
     condition = np.array([ True if np.min(np.abs(D1_plus[x] - D2)) < np.min(np.abs(D1_minus[x] - D2)) \
-                      else False for x in range(D1.size)])
+                      else False for x in range(D1.size)],dtype=bool)
     D1 = np.where(condition,D1_plus,D1_minus)
     return D1
