@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.linalg import eigvalsh
 from scipy.linalg import schur, eigh, eig, hessenberg,eigvals
+from scipy.optimize import linear_sum_assignment
+
 
 def randdiag(U):
     H = (U+U.conj().T) / 2; S = (U-U.conj().T) / 2
@@ -26,3 +28,21 @@ def eigenvalue_unitary_angle(U):
                       else False for x in range(D1.size)],dtype=bool)
     D1 = np.where(condition,D1_plus,D1_minus)
     return D1
+
+def random_normal_matrix(n:int):
+    A = np.random.randn(n,n) + 1j*np.random.randn(n,n)
+    U,_ = np.linalg.qr(A)
+    d = (np.random.randn(n) / np.sqrt(2) ) + (1j*np.random.randn(n) / np.sqrt(2) )
+    return U @ np.diag(d) @ U.conj().T, d
+
+def compare_eigenvalues(d1,d2):
+    n = d1.shape[0]
+    distances = np.zeros((n,n))
+    for i in range(n):
+        for j in range(n):
+            distances[i,j] = np.linalg.norm(d1[i]- d2[j]) ** 2
+    row_ind, col_ind = linear_sum_assignment(distances)
+    return col_ind, np.sqrt(distances[row_ind,col_ind].sum()) / np.linalg.norm(d1)
+
+def report_stats(error_array):
+    return np.mean(error_array), np.std(error_array), np.min(error_array), np.max(error_array)
